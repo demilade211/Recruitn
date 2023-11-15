@@ -6,6 +6,22 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
   {
+    firstName: {
+      type: String,
+      maxlength: [30, "Your name cannot exceed 30 characters"],
+    },
+    lastName: {
+      type: String,
+      maxlength: [30, "Your name cannot exceed 30 characters"],
+    },
+    numOfEmployees: {
+      type: Number,
+      maxlength: [30, "Your name cannot exceed 30 characters"],
+    },
+    phoneNumber: {
+      type: String,
+      maxlength: [30, "Your name cannot exceed 30 characters"],
+    },
     companyName: {
       type: String,
       maxlength: [30, "Your name cannot exceed 30 characters"],

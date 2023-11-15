@@ -2,11 +2,9 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import UserModel from "../models/userModel"
 import ErrorHandler from '../utils/errorHandler';
 import { Request, Response, NextFunction } from 'express'; 
+import {CustomRequest} from "../utils/types"
 
-interface CustomRequest extends Request {
-    user?: any | null,
-    headers:any 
-}
+
 
 export const authenticateUser = async(req: CustomRequest, res: Response, next: NextFunction)=>{
     try {
