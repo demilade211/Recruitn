@@ -181,8 +181,8 @@ export const applyForJob = async (req: CustomRequest, res: Response, next: NextF
     const { jobId } = req.params;
     const { firstName, lastName, email, resume, yearsOfExperience } = req.body
     try {
-        // const job = await JobModel.findById(jobId).populate("applicants.applicant")
-        // if (!job) return next(new ErrorHandler("job not found", 404))
+        const job = await JobModel.findById(jobId).populate("applicants.applicant")
+        if (!job) return next(new ErrorHandler("job not found", 404))
 
         // if (!email || !yearsOfExperience ) return next(new ErrorHandler("All fields required", 400));
 
