@@ -184,35 +184,74 @@ export const applyForJob = async (req: CustomRequest, res: Response, next: NextF
         const job = await JobModel.findById(jobId).populate("applicants.applicant")
         if (!job) return next(new ErrorHandler("job not found", 404))
 
-        // if (!email || !yearsOfExperience ) return next(new ErrorHandler("All fields required", 400));
+        if (!email || !yearsOfExperience || !firstName || !lastName  ) return next(new ErrorHandler("All fields required", 400));
 
-        // let newApplicant = {
-        //     firstName,
-        //     lastName,
-        //     email,
-        //     resume,
-        //     yearsOfExperience
-        // }
+        let newApplicant = {
+            firstName,
+            lastName,
+            email,
+            resume,
+            yearsOfExperience
+        }
 
-        // const existingApplicant = await ApplicantModel.findOne({ email: email.toLowerCase() });
+        const existingApplicant = await ApplicantModel.findOne({ email: email.toLowerCase() });
 
-        // let applicant 
+        let applicant 
 
-        // if (existingApplicant) {
-        //     applicant= existingApplicant;
-        // }else{
-        //     applicant= await ApplicantModel.create(newApplicant);
-        // } 
+        if (existingApplicant) {
+            applicant= existingApplicant;
+        }else{
+            applicant= await ApplicantModel.create(newApplicant);
+        } 
 
-        // const alreadyApplied = job.applicants.find((val:Applicants) => val.applicant.email === email);
-        // console.log(alreadyApplied.length);
+        const alreadyApplied = job.applicants.filter((val:any) => val.applicant.email === email).length>0; 
         
-        // await job.applicants.unshift({ applicant: applicant._id })
-        // await job.save()
+        if (alreadyApplied) return next(new ErrorHandler("Already applied", 400));
+
+        await job.applicants.unshift({ applicant: applicant._id })
+        await job.save()
 
         return res.status(200).json({
             success: true,
             message: "Applied Successfully"
+        })
+
+    } catch (error) {
+        return next(error)
+    }
+}
+
+export const closeJob = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const { jobId } = req.params; 
+    try {
+        const job = await JobModel.findById(jobId).populate("applicants.applicant")
+        if (!job) return next(new ErrorHandler("job not found", 404)) 
+
+        job.status = "closed"
+        await job.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Job Closed Successfully"
+        })
+
+    } catch (error) {
+        return next(error)
+    }
+}
+
+export const openJob = async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const { jobId } = req.params; 
+    try {
+        const job = await JobModel.findById(jobId).populate("applicants.applicant")
+        if (!job) return next(new ErrorHandler("job not found", 404)) 
+
+        job.status = "open"
+        await job.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Job Opened Successfully"
         })
 
     } catch (error) {

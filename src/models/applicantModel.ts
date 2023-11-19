@@ -20,6 +20,9 @@ const ApplicantSchema = new Schema(
             unique: true, // cant have more than one if this
             validate: [validator.isEmail, "Please enter valid email address"],
         },
+        phoneNumber: {
+            type: String, 
+        },
         resume: {
             public_id: {
                 type: String,
