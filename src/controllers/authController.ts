@@ -10,7 +10,7 @@ import createToken from "../utils/createToken";
 
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { firstName,lastName,numOfEmployees,phoneNumber,companyName, email, password, confirmPassword } = req.body;
+    const { firstName, lastName, numOfEmployees, phoneNumber, companyName, email, password, confirmPassword } = req.body;
 
     if (!firstName || !lastName || !numOfEmployees || !phoneNumber || !companyName || !email || !password || !confirmPassword) return next(new ErrorHandler("All fields required", 400));
 
@@ -31,7 +31,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
       email: email.toLowerCase(),
       password,
     });
-  
+
     const payload = { userid: savedUser._id };
 
     let authToken = await createToken(payload);
@@ -56,11 +56,19 @@ export const loginUser = async (
   try {
     if (!email || !password) return next(new ErrorHandler("Email and password is required", 400));
 
-    const user = await UserModel.findOne({ email }).select("+password");
-    const checkPassword = await bcrypt.compare(password, user?.password!);
+    if (password.length < 6) return next(new ErrorHandler("Password cannot be less than 6 characters", 200))
 
-    if (!user || !checkPassword) {
-      return next(new ErrorHandler("Email or password is incorrect", 401));
+
+    const user = await UserModel.findOne({ email: email.toLowerCase() }).select("+password")
+
+
+    if (!user) return next(new ErrorHandler("Invalid Credentials", 200)) 
+     
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return next(new ErrorHandler("Invalid Credentials", 200))
     }
 
     const payload = { userid: user._id };

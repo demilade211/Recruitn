@@ -12,7 +12,7 @@ router.route('/job/apply/:jobId').post(applyForJob);
 router.route('/job/jobs').get(getJobs);
 router.route('/job/:jobId').get(authenticateUser, getJobById)
     .delete(authenticateUser, deleteJob);
-router.route('/job/me/:userId').get(authenticateUser, getCompanyJobs);
+router.route('/jobs/me').get(authenticateUser, getCompanyJobs);
 
 
 

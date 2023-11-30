@@ -29,8 +29,7 @@ const ApplicantSchema = new Schema(
                 default: "App/user_mklcpl.png",
             },
             url: {
-                type: String,
-                default: "https://res.cloudinary.com/indersingh/image/upload/v1593464618/App/user_mklcpl.png",
+                type: String, 
             },
         },
         yearsOfExperience: {

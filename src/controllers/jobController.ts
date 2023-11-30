@@ -110,21 +110,24 @@ export const getJobById = async (req: CustomRequest, res: Response, next: NextFu
     }
 }
 
-export const getCompanyJobs = async (req: Request, res: Response, next: NextFunction) => {
-    const { userId } = req.params;
+export const getCompanyJobs = async (req: CustomRequest, res: Response, next: NextFunction) => {
+     
     const { pageNumber } = req.query;
     const size = 8;
+    const {_id} = req.user;
+
     try {
 
-        const user = await UserModel.findOne({ _id: userId })
+        const user = await UserModel.findOne({ _id })
 
         if (!user) return next(new ErrorHandler("User not found", 404))
 
         console.log(user);
         
-        const jobs = await JobModel.find()
+        const jobs = await JobModel.find({ user: _id })
             .sort({ createdAt: -1 })
             .populate("user")
+            .populate("applicants.applicant")
 
 
         let paginatedJobs = paginate(jobs, Number(pageNumber), size)
@@ -184,7 +187,7 @@ export const applyForJob = async (req: CustomRequest, res: Response, next: NextF
         const job = await JobModel.findById(jobId).populate("applicants.applicant")
         if (!job) return next(new ErrorHandler("job not found", 404))
 
-        if (!email || !yearsOfExperience || !firstName || !lastName  ) return next(new ErrorHandler("All fields required", 400));
+        if (!email || !yearsOfExperience || !firstName || !lastName || !resume  ) return next(new ErrorHandler("All fields required", 400));
 
         let newApplicant = {
             firstName,
@@ -199,11 +202,14 @@ export const applyForJob = async (req: CustomRequest, res: Response, next: NextF
         let applicant 
 
         if (existingApplicant) {
-            applicant= existingApplicant;
+            applicant = existingApplicant;
+            console.log("yes");
+            
         }else{
             applicant= await ApplicantModel.create(newApplicant);
         } 
-
+        console.log(job.applicants);
+        
         const alreadyApplied = job.applicants.filter((val:any) => val.applicant.email === email).length>0; 
         
         if (alreadyApplied) return next(new ErrorHandler("Already applied", 400));
