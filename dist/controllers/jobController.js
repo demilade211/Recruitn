@@ -92,7 +92,8 @@ const getJobById = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     const { jobId } = req.params;
     try {
         const job = yield jobModel_1.default.findById(jobId)
-            .populate('user');
+            .populate('user')
+            .populate("applicants.applicant");
         if (!job)
             return next(new errorHandler_1.default("Job not found", 404));
         return res.status(200).json({
@@ -106,17 +107,18 @@ const getJobById = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.getJobById = getJobById;
 const getCompanyJobs = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.params;
     const { pageNumber } = req.query;
     const size = 8;
+    const { _id } = req.user;
     try {
-        const user = yield userModel_1.default.findOne({ _id: userId });
+        const user = yield userModel_1.default.findOne({ _id });
         if (!user)
             return next(new errorHandler_1.default("User not found", 404));
         console.log(user);
-        const jobs = yield jobModel_1.default.find()
+        const jobs = yield jobModel_1.default.find({ user: _id })
             .sort({ createdAt: -1 })
-            .populate("user");
+            .populate("user")
+            .populate("applicants.applicant");
         let paginatedJobs = (0, helpers_1.paginate)(jobs, Number(pageNumber), size);
         return res.status(200).json({
             success: true,

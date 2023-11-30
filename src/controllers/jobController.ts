@@ -97,6 +97,7 @@ export const getJobById = async (req: CustomRequest, res: Response, next: NextFu
     try {
         const job = await JobModel.findById(jobId)
             .populate('user')
+            .populate("applicants.applicant")
 
         if (!job) return next(new ErrorHandler("Job not found", 404))
 

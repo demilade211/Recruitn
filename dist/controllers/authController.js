@@ -56,10 +56,14 @@ const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     try {
         if (!email || !password)
             return next(new errorHandler_1.default("Email and password is required", 400));
-        const user = yield userModel_1.default.findOne({ email }).select("+password");
-        const checkPassword = yield bcryptjs_1.default.compare(password, user === null || user === void 0 ? void 0 : user.password);
-        if (!user || !checkPassword) {
-            return next(new errorHandler_1.default("Email or password is incorrect", 401));
+        if (password.length < 6)
+            return next(new errorHandler_1.default("Password cannot be less than 6 characters", 200));
+        const user = yield userModel_1.default.findOne({ email: email.toLowerCase() }).select("+password");
+        if (!user)
+            return next(new errorHandler_1.default("Invalid Credentials", 200));
+        const isMatch = yield bcryptjs_1.default.compare(password, user.password);
+        if (!isMatch) {
+            return next(new errorHandler_1.default("Invalid Credentials", 200));
         }
         const payload = { userid: user._id };
         let authToken = yield (0, createToken_1.default)(payload);

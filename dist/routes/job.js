@@ -14,5 +14,5 @@ router.route('/job/apply/:jobId').post(jobController_1.applyForJob);
 router.route('/job/jobs').get(jobController_1.getJobs);
 router.route('/job/:jobId').get(authMiddleware_1.authenticateUser, jobController_1.getJobById)
     .delete(authMiddleware_1.authenticateUser, jobController_1.deleteJob);
-router.route('/job/me/:userId').get(authMiddleware_1.authenticateUser, jobController_1.getCompanyJobs);
+router.route('/jobs/me').get(authMiddleware_1.authenticateUser, jobController_1.getCompanyJobs);
 exports.default = router;
